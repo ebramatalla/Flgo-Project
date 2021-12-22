@@ -3,18 +3,19 @@ import Felgo 3.0
 import QtMultimedia 5.15
 
 
-// EMPTY SCENE
+// This scene apear when the user lose
 
 Scene {
-    id:gameover
-    property int fscore : activeScene.score
+    id: gameover
 
-
+    // Set the background image
     Image {
         id: bg
         anchors.fill: parent
         source: "../assets/BG.jpg"
     }
+
+    // Add the chicken image
     Image {
         id: chiken
         x:190
@@ -24,7 +25,7 @@ Scene {
         source: "../assets/pngwing.com.png"
     }
 
-
+    // Game Over text
     Text {
         x:155
         y:105
@@ -34,6 +35,7 @@ Scene {
 
     }
 
+    // Player score text
     Text {
         x:120
         y:155
@@ -42,29 +44,34 @@ Scene {
         color: "white"
 
     }
+
+    // Tell the user to go to main menu
     Text {
         x:150
         y:210
         font.pointSize: 18
-        text: "𝗣𝗿𝗲𝘀𝘀 𝗧𝗼 𝗥𝗲𝘀𝘁𝗮𝗿𝘁"
+        text: "Go To Main Menu"
         color: "white"
-
     }
+
+    /* Handle user mouse click in the screen */
     MouseArea {
-        anchors.fill: parent
+        // Enable the mouse click in all the screen
+        anchors.fill: parent // Parent -> Scene
+
+        // Handle if the user click the left button
         onReleased: {
+            // Create new menu Component
             var Component =Qt.createComponent("Menu.qml")
-                var window =Component.createObject(gameWindow)
-                gameover.visible=false
-                window.show
-                 lose.stop()
-            score=0
-            helth=03
-
-
-
-
-
+            // Create new menu object
+            var window =Component.createObject(gameWindow)
+            // Disappear thee game over scene
+            gameover.visible=false
+            // Show the menu
+            window.show
+            // Re-initialize the score and the health
+            score = 0
+            helth = 3
         }
     }
 

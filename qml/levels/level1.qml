@@ -12,7 +12,7 @@ Scene {
 
         // User-defined variables
         property int helth: 3
-        property int speed: 3000
+        property int movementDuration: 3000
         property bool win: false
         property int score : 0
 
@@ -36,10 +36,10 @@ Scene {
 
         onScoreChanged: {
             if(score > 10) {
-               speed =2500
+               movementDuration =2500
             }
             if(score > 15) {
-               speed=2000
+               movementDuration=2000
             }
             if(score > 20) {
                 // User win
@@ -113,7 +113,7 @@ Scene {
         Text {
             id: winlevel1
             text: qsTr("Passed Level 1, Be careful the speed has increased..")
-            x:220
+            x:150
             y:280
             color: "white"
             font.pointSize: 24
@@ -143,7 +143,7 @@ Scene {
                 NumberAnimation on x {
                     from: -level1.width
                     to: level1.width
-                    duration: speed
+                    duration: movementDuration
 
 
 
@@ -161,8 +161,10 @@ Scene {
                         // mack sure the body hit the collider is knife
                         if(collidedEntity.entityType === "knife") {
                             score++
+                            // remove the entity
                             collidedEntity.removeEntity()
                             removeEntity()
+                            // play sound
                             kak.play()
                         }
 
@@ -171,21 +173,23 @@ Scene {
                 }
             }
         }
-
+        //knife Component
         Component {
             id: knife
 
             EntityBase {
                 entityType: "knife"
+                // make the place of Component same as player
                 x:player.x
                 y:player.y
+
 
                 Image {
                     id: knifeimg
                     source: "../../assets/Knife.png"
                 }
 
-
+                // make the knife go up
                 PropertyAnimation on y {
                     from: player.y
                     to: GameWindow.height-100
@@ -197,23 +201,25 @@ Scene {
                     }
 
                 }
-
+                // collider of knife
                 BoxCollider {
                     anchors.fill: knifeimg
                     collisionTestingOnlyMode: true
                 }
             }
         }
-
+// mouse
         MouseArea {
+
             anchors.fill: parent
+            // on clicked
             onReleased: {
-
-
+                // create Components
                 entityManager.createEntityFromComponent(knife, 1)
+                // play sound
                 knifesound.play()
                 if(winlevel1.visible){
-                    var Component =Qt.createComponent("game3.qml")
+                    var Component =Qt.createComponent("level2.qml")
                         var window =Component.createObject(gameWindow)
                         level1.visible=false
                         window.show

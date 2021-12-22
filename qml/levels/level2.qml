@@ -3,15 +3,13 @@ import Felgo 3.0
 import QtMultimedia 5.15
 
 
-// EMPTY level1
-
-    Scene {
-        id: level3
+Scene {
+        id: level2
         width: 960
         height: 640
         property int health2: level1.helth
 
-        property int speed: 3000
+        property int movementDuration: 3000
         property int rotspeed: 3000
         property bool win3: false
 
@@ -20,11 +18,11 @@ import QtMultimedia 5.15
         onScoreChanged: {
             if(score>25)
             {
-                speed=3000
+                movementDuration=3000
                 rotspeed=1500
             }if(score>30)
             {
-                winlevel3.visible=true
+                winlevel2.visible=true
                 win3=true
             }
         }
@@ -32,23 +30,19 @@ import QtMultimedia 5.15
         if(health2==0){
             var Component =Qt.createComponent("../Gameover.qml")
                 var window =Component.createObject(gameWindow)
-                level3.visible=false
+                level2.visible=false
                 window.show
-            lose.play()
 
         }}
         EntityManager {
             id: entityManager
-            entityContainer: level3
+            entityContainer: level2
         }
         SoundEffect {
                id: kak
                source: "../../assets/audio/kak.wav"
            }
-        SoundEffect {
-            id: lose
-            source: "../../assets/audio/Lose.wav"
-        }
+
         SoundEffect {
                id: knifesound
                source: "../../assets/audio/KnifeShoot.wav"
@@ -94,9 +88,9 @@ import QtMultimedia 5.15
                 y: 60
 
                 NumberAnimation on x {
-                    from: -level3.width
-                    to: level3.width
-                    duration: speed
+                    from: -level2.width
+                    to: level2.width
+                    duration: movementDuration
 
 
 
@@ -163,10 +157,10 @@ import QtMultimedia 5.15
 
                 entityManager.createEntityFromComponent(knife, 1)
                 knifesound.play()
-                if(winlevel3.visible){
-                    var Component =Qt.createComponent("game4.qml")
+                if(winlevel2.visible){
+                    var Component =Qt.createComponent("level3.qml")
                         var window =Component.createObject(gameWindow)
-                        level3.visible=false
+                        level2.visible=false
                         window.show
 
 
@@ -196,9 +190,10 @@ import QtMultimedia 5.15
 
         }
         Text {
-            id: winlevel3
-            text: qsTr("Now You In Level 4")
-            x:340
+            id: winlevel2
+            text: qsTr("          Passed Level 2, Be careful
+the speed has increased and it will rain..")
+            x:240
             y:280
             color: "white"
             font.pointSize: 24
@@ -207,7 +202,7 @@ import QtMultimedia 5.15
 
         }
         Timer {
-            running: level3.visible == true
+            running: level2.visible == true
             repeat: true
             interval: 1000
             onTriggered: addTarget()

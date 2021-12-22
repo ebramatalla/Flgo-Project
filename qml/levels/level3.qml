@@ -3,38 +3,30 @@ import Felgo 3.0
 import QtMultimedia 5.15
 
 
-// EMPTY SCENE
-
-    Scene {
+Scene {
         id: level3
         width: 960
         height: 640
-        property int health2: scene.helth
+        // Get the health from the last level
+        property int health4: level2.health2
+        property int movementDuration: 3000
+        property bool win: false
 
-        property int speed: 3000
-        property int rotspeed: 3000
-        property bool win3: false
 
-
-        property int score : 21
+        property int score : 31
         onScoreChanged: {
-            if(score>25)
-            {
-                speed=3000
-                rotspeed=1500
-            }if(score>30)
-            {
-                winlevel3.visible=true
-                win3=true
+
+            if(score > 51) {
+              movementDuration =2000
             }
+
         }
-        onHealth2Changed: {
-        if(health2==0){
+        onHealth4Changed: {
+        if(health4==0){
             var Component =Qt.createComponent("../Gameover.qml")
                 var window =Component.createObject(gameWindow)
                 level3.visible=false
                 window.show
-            lose.play()
 
         }}
         EntityManager {
@@ -45,10 +37,7 @@ import QtMultimedia 5.15
                id: kak
                source: "../../assets/audio/kak.wav"
            }
-        SoundEffect {
-            id: lose
-            source: "../../assets/audio/Lose.wav"
-        }
+
         SoundEffect {
                id: knifesound
                source: "../../assets/audio/KnifeShoot.wav"
@@ -67,6 +56,23 @@ import QtMultimedia 5.15
             x: parent.width/2
             y: 560
             source: "../../assets/Knife.png"
+            MouseArea{
+                anchors.fill: parent
+                drag.target: parent
+                drag.axis: Drag.XAxis
+                drag.maximumX: GameWindow.width - parent.width
+                drag.minimumX:  0
+
+                onReleased: {
+                    entityManager.createEntityFromComponent(knife, 1)
+
+
+                }
+
+
+
+            }
+
         }
 
 
@@ -80,14 +86,6 @@ import QtMultimedia 5.15
                     source: "../../assets/pngwing.com.png"
                     height: 110
                     width: 110
-                    RotationAnimation on rotation {
-                        id:rot
-                        from: 0
-                        to:360
-                        duration: rotspeed
-                        running: true
-                        loops: Animation.Infinite
-                    }
 
                 }
 
@@ -96,8 +94,12 @@ import QtMultimedia 5.15
                 NumberAnimation on x {
                     from: -level3.width
                     to: level3.width
-                    duration: speed
-
+                    duration: movementDuration
+                    onStopped: {
+                        if(!win){
+                        health4--
+                        }
+                    }
 
 
 
@@ -141,10 +143,6 @@ import QtMultimedia 5.15
                     from: player.y
                     to: GameWindow.height-100
                     duration: 200
-                    onStopped: {
-                        if(!win3){
-                        health2--}
-                    }
                 }
 
                 BoxCollider {
@@ -153,26 +151,44 @@ import QtMultimedia 5.15
                 }
             }
         }
+        Component {
+            id: egg
+
+            EntityBase {
+                entityType: "egg"
+                Image {
+                    id: eggimg
+                    source: "../../assets/egg.png"
+                }
+                x:utils.generateRandomValueBetween(0, level3.width)
 
 
+                PropertyAnimation on y {
+                    from: chiken.y
+                    to: level3.height
+                    duration: 2000
+                }
 
-        MouseArea {
-            anchors.fill: parent
-            onReleased: {
+                BoxCollider {
+                    anchors.fill: eggimg
+                    collisionTestingOnlyMode: true
+                    fixture.onBeginContact: {
 
+                        var collidedEntity = other.getBody().target
+                        if(collidedEntity.entityType === "knife") {
+                            health4--
+                            collidedEntity.removeEntity()
+                            removeEntity()
+                        }
 
-                entityManager.createEntityFromComponent(knife, 1)
-                knifesound.play()
-                if(winlevel3.visible){
-                    var Component =Qt.createComponent("game4.qml")
-                        var window =Component.createObject(gameWindow)
-                        level3.visible=false
-                        window.show
-
-
+                    }
                 }
             }
         }
+
+
+
+
         Text {
             text: "score: " + score
 
@@ -185,7 +201,7 @@ import QtMultimedia 5.15
 
         }
         Text {
-            text: "health: " + health2
+            text: "Health: " + health4
 
             font.family: "Anton"
             font.pointSize: 24
@@ -195,25 +211,32 @@ import QtMultimedia 5.15
             color: "white"
 
         }
-        Text {
-            id: winlevel3
-            text: qsTr("Now You In Level 4")
-            x:340
-            y:280
-            color: "white"
-            font.pointSize: 24
-            visible: false
 
-
-        }
         Timer {
             running: level3.visible == true
             repeat: true
             interval: 1000
             onTriggered: addTarget()
         }
+        Timer {
+            running: level3.visible == true
+            repeat: true
+            interval: 500
+            onTriggered: addegg()
+        }
+        Timer {
+            running: level3.visible == true
+            repeat: true
+            interval: 200
+            onTriggered: addknife()
+        }
         function addTarget() {
             entityManager.createEntityFromComponent(chiken)
+        }
+        function addegg() {
+            entityManager.createEntityFromComponent(egg)
+        } function addknife() {
+            entityManager.createEntityFromComponent(knife)
         }
 
 
